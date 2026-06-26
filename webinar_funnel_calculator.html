@@ -69,25 +69,25 @@
       <div id="presetHint" class="note" style="margin:0 0 12px;padding:0;border:none;font-size:11.5px"></div>
 
       <div class="scen">
-        <button data-reg="100">100 рег.</button>
-        <button data-reg="300">300 рег.</button>
-        <button data-reg="1000" class="active">1000 рег.</button>
+        <button data-reg="100">100 Lead</button>
+        <button data-reg="300">300 Lead</button>
+        <button data-reg="1000" class="active">1000 Lead</button>
       </div>
 
       <div class="field">
-        <label>Регистрантов на вебинар <b id="regV">1000</b></label>
+        <label>Lead на вебинар <b id="regV">1000</b></label>
         <input type="number" id="reg" value="1000" min="1" step="10">
       </div>
       <div class="field">
-        <label>Цена регистранта, $ <b id="cprV">$18</b></label>
+        <label>Цена Lead, $ <b id="cprV">$18</b></label>
         <input type="range" id="cpr" min="4" max="60" value="18" step="1">
       </div>
       <div class="field">
-        <label>% регистрантов = MQL (владелец $1M+) <b id="mqlV">33%</b></label>
+        <label>% Lead = MQL (владелец $1M+) <b id="mqlV">33%</b></label>
         <input type="range" id="mql" min="10" max="100" value="33" step="1">
       </div>
       <div class="field">
-        <label>Регистрант → пришёл на вебинар <b id="attV">40%</b></label>
+        <label>Lead → пришёл на вебинар <b id="attV">40%</b></label>
         <input type="range" id="att" min="10" max="70" value="40" step="1">
       </div>
       <div class="field">
@@ -135,7 +135,7 @@
       </div>
 
       <div class="card" style="margin-top:18px">
-        <h2>Точка безубыточности по цене регистранта</h2>
+        <h2>Точка безубыточности по стоимости MQL</h2>
         <div class="be">
           <div class="box"><div class="lab">Окупиться в 1-й месяц (1 платёж)</div><div class="val acc" id="be1"></div></div>
           <div class="box"><div class="lab">Окупиться на LTV</div><div class="val good" id="beltv"></div></div>
@@ -227,12 +227,12 @@ function calc(){
 
   // overall reg->sale conv
   const conv = attP*bookP*heldP*closeP;
-  const be1 = price>0 ? price*conv : 0;        // breakeven cost/reg on 1 payment
-  const beLtv = ltv>0 ? ltv*conv : 0;          // breakeven cost/reg on LTV
+  const be1 = price>0 ? (price*conv)/mqlP : 0;        // breakeven cost/MQL on 1 payment
+  const beLtv = ltv>0 ? (ltv*conv)/mqlP : 0;          // breakeven cost/MQL on LTV
 
   // table
   const rows = [
-    ['Регистранты','100%', reg.toLocaleString('en-US'), money(cpr)],
+    ['Lead','100%', reg.toLocaleString('en-US'), money(cpr)],
     ['MQL (владелец $1M+)', (+$('mql').value)+'%', num1(mql), money(cMql)],
     ['Пришли на вебинар', (+$('att').value)+'%', num1(att), '—'],
     ['Бронь диагностики (MB)', (+$('book').value)+'% от пришедших', num1(mb), money(cMb)],
@@ -243,7 +243,7 @@ function calc(){
 
   // bars (relative to registrants)
   const bars = [
-    ['Регистранты', reg],
+    ['Lead', reg],
     ['Пришли', att],
     ['Бронь (MB)', mb],
     ['Дошли (MH)', mh],
@@ -267,15 +267,16 @@ function calc(){
   $('ltvrev').textContent = money(ltvRev);
   $('profit').innerHTML = `<span class="${profit>=0?'good':'bad'}">${money(profit)}</span>`;
 
-  $('be1').textContent = money(be1)+' / рег.';
-  $('beltv').textContent = money(beLtv)+' / рег.';
+  $('be1').textContent = money(be1)+' / MQL';
+  $('beltv').textContent = money(beLtv)+' / MQL';
 
   // verdict
   let v='';
-  if(cpr<=be1) v=`При цене регистранта ${money(cpr)} и текущих конверсиях каждая сделка окупает трафик уже <b class="good">в 1-й месяц</b> (порог ${money(be1)}/рег.). Месяцы 2+ это прибыль.`;
-  else if(cpr<=beLtv) v=`Цена регистранта ${money(cpr)} окупается <b class="acc">не сразу, но на горизонте LTV</b> (порог месяца-1 ${money(be1)}/рег., LTV ${money(beLtv)}/рег.). Окупаемость CAC ~${num1(paybackMo)} мес.`;
-  else v=`<b class="bad">Убыток.</b> Цена регистранта ${money(cpr)} выше LTV-порога ${money(beLtv)}/рег. Снижай цену лида или поднимай доходимость/конверсию.`;
-  $('verdict').innerHTML = v + ` &nbsp;|&nbsp; Сквозная конверсия регистрант → продажа: <b>${(conv*100).toFixed(2)}%</b>.`;
+  const cMqlVal = cMql;
+  if(cMqlVal<=be1) v=`При стоимости MQL ${money(cMqlVal)} и текущих конверсиях каждая сделка окупает трафик уже <b class="good">в 1-й месяц</b> (порог ${money(be1)}/MQL). Месяцы 2+ это прибыль.`;
+  else if(cMqlVal<=beLtv) v=`Стоимость MQL ${money(cMqlVal)} окупается <b class="acc">не сразу, но на горизонте LTV</b> (порог месяца-1 ${money(be1)}/MQL, LTV ${money(beLtv)}/MQL). Окупаемость CAC ~${num1(paybackMo)} мес.`;
+  else v=`<b class="bad">Убыток.</b> Стоимость MQL ${money(cMqlVal)} выше LTV-порога ${money(beLtv)}/MQL. Снижай цену лида или поднимай доходимость/конверсию.`;
+  $('verdict').innerHTML = v + ` &nbsp;|&nbsp; Сквозная конверсия Lead → продажа: <b>${(conv*100).toFixed(2)}%</b>.`;
 }
 applyPreset('our');
 </script>
