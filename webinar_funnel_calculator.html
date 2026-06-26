@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Калькулятор вебинарной воронки — BB USA</title>
+<style>
+  :root{
+    --bg:#0e1116; --card:#171b22; --card2:#1e232c; --line:#2a313c;
+    --txt:#e8edf4; --muted:#9aa6b5; --accent:#ffd23f; --green:#34d399;
+    --red:#f87171; --blue:#60a5fa;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.45;padding:24px}
+  .wrap{max-width:1120px;margin:0 auto}
+  h1{font-size:22px;font-weight:700;margin-bottom:4px}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:20px}
+  .grid{display:grid;grid-template-columns:340px 1fr;gap:18px}
+  @media(max-width:880px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+  .card h2{font-size:13px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:14px;font-weight:600}
+  .field{margin-bottom:14px}
+  .field label{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}
+  .field label b{color:var(--accent);font-variant-numeric:tabular-nums}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  input[type=number]{width:100%;background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:8px 10px;font-size:14px}
+  .scen{display:flex;gap:8px;margin-bottom:14px}
+  .scen button{flex:1;background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:8px;cursor:pointer;font-size:13px}
+  .scen button.active{background:var(--accent);color:#111;border-color:var(--accent);font-weight:700}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{padding:9px 8px;text-align:right;border-bottom:1px solid var(--line)}
+  th:first-child,td:first-child{text-align:left}
+  thead th{color:var(--muted);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.4px}
+  .stage td:first-child{font-weight:600}
+  td.num{font-variant-numeric:tabular-nums}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}
+  @media(max-width:880px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .kpi{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:14px}
+  .kpi .lab{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+  .kpi .val{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}
+  .kpi .hint{font-size:11px;color:var(--muted);margin-top:4px}
+  .good{color:var(--green)} .bad{color:var(--red)} .acc{color:var(--accent)} .blue{color:var(--blue)}
+  .funnelbars{margin-top:14px}
+  .bar{display:flex;align-items:center;gap:10px;margin-bottom:7px;font-size:12.5px}
+  .bar .lab{width:150px;color:var(--muted)}
+  .bar .track{flex:1;background:var(--card2);border-radius:6px;height:22px;overflow:hidden}
+  .bar .fill{height:100%;background:linear-gradient(90deg,var(--accent),#ffb800);display:flex;align-items:center;padding-left:8px;font-weight:700;color:#111;border-radius:6px;white-space:nowrap}
+  .note{font-size:12px;color:var(--muted);margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+  .be{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+  .be .box{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:12px}
+  .be .box .lab{font-size:11px;color:var(--muted);margin-bottom:4px}
+  .be .box .val{font-size:17px;font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Калькулятор вебинарной воронки · BB USA</h1>
+  <div class="sub">US trucking-владельцы $1M+ → вебинар → диагностика → продукт $4 990/мес. Крути ползунки, цифры пересчитываются вживую.</div>
+
+  <div class="grid">
+    <!-- INPUTS -->
+    <div class="card">
+      <h2>Входные данные</h2>
+
+      <div class="scen" style="margin-bottom:10px">
+        <button id="presetOur" class="active">Наши данные</button>
+        <button id="presetBench">Бенчмарки US B2B</button>
+      </div>
+      <div id="presetHint" class="note" style="margin:0 0 12px;padding:0;border:none;font-size:11.5px"></div>
+
+      <div class="scen">
+        <button data-reg="100">100 рег.</button>
+        <button data-reg="300">300 рег.</button>
+        <button data-reg="1000" class="active">1000 рег.</button>
+      </div>
+
+      <div class="field">
+        <label>Регистрантов на вебинар <b id="regV">1000</b></label>
+        <input type="number" id="reg" value="1000" min="1" step="10">
+      </div>
+      <div class="field">
+        <label>Цена регистранта, $ <b id="cprV">$18</b></label>
+        <input type="range" id="cpr" min="4" max="60" value="18" step="1">
+      </div>
+      <div class="field">
+        <label>% регистрантов = MQL (владелец $1M+) <b id="mqlV">33%</b></label>
+        <input type="range" id="mql" min="10" max="100" value="33" step="1">
+      </div>
+      <div class="field">
+        <label>Регистрант → пришёл на вебинар <b id="attV">40%</b></label>
+        <input type="range" id="att" min="10" max="70" value="40" step="1">
+      </div>
+      <div class="field">
+        <label>Пришёл → забронировал диагностику (MB) <b id="bookV">17.5%</b></label>
+        <input type="range" id="book" min="3" max="50" value="17.5" step="0.5">
+      </div>
+      <div class="field">
+        <label>Бронь → дошёл до диагностики (MH) <b id="heldV">22%</b></label>
+        <input type="range" id="held" min="10" max="80" value="22" step="1">
+      </div>
+      <div class="field">
+        <label>Диагностика → продажа <b id="closeV">30%</b></label>
+        <input type="range" id="close" min="5" max="60" value="30" step="1">
+      </div>
+      <div class="field">
+        <label>Цена продукта, $/мес <b id="priceV">$4990</b></label>
+        <input type="number" id="price" value="4990" min="0" step="100">
+      </div>
+      <div class="field">
+        <label>Средний срок жизни клиента, мес (LTV) <b id="retV">4</b></label>
+        <input type="range" id="ret" min="1" max="18" value="4" step="1">
+      </div>
+    </div>
+
+    <!-- OUTPUTS -->
+    <div>
+      <div class="card">
+        <h2>Воронка и цена за этап</h2>
+        <table>
+          <thead><tr><th>Этап</th><th>Конверсия</th><th>Кол-во</th><th>Цена за единицу</th></tr></thead>
+          <tbody id="ftable"></tbody>
+        </table>
+        <div class="funnelbars" id="fbars"></div>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi"><div class="lab">Рекламный бюджет</div><div class="val" id="spend"></div></div>
+        <div class="kpi"><div class="lab">Новый MRR (мес)</div><div class="val good" id="mrr"></div></div>
+        <div class="kpi"><div class="lab">CAC (цена сделки)</div><div class="val" id="cac"></div></div>
+        <div class="kpi"><div class="lab">Окупаемость CAC</div><div class="val" id="payback"></div></div>
+        <div class="kpi"><div class="lab">ROAS 1-й месяц</div><div class="val" id="roas1"></div></div>
+        <div class="kpi"><div class="lab">ROAS на LTV</div><div class="val acc" id="roasltv"></div></div>
+        <div class="kpi"><div class="lab">Выручка LTV</div><div class="val blue" id="ltvrev"></div></div>
+        <div class="kpi"><div class="lab">Прибыль LTV (выр.−трафик)</div><div class="val" id="profit"></div></div>
+      </div>
+
+      <div class="card" style="margin-top:18px">
+        <h2>Точка безубыточности по цене регистранта</h2>
+        <div class="be">
+          <div class="box"><div class="lab">Окупиться в 1-й месяц (1 платёж)</div><div class="val acc" id="be1"></div></div>
+          <div class="box"><div class="lab">Окупиться на LTV</div><div class="val good" id="beltv"></div></div>
+        </div>
+        <div class="note" id="verdict"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const ids = ['reg','cpr','mql','att','book','held','close','price','ret'];
+ids.forEach(i => $(i).addEventListener('input', calc));
+document.querySelectorAll('.scen button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.scen button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    $('reg').value = b.dataset.reg;
+    calc();
+  });
+});
+
+// presets: только конверсии и цена лида. Цена продукта, удержание и кол-во рег. не трогаем.
+const PRESETS = {
+  our:   {cpr:18, mql:33, att:40, book:17.5, held:22, close:30,
+          hint:'Наши данные: доходимость до диагностики 22% (факт BB USA).'},
+  bench: {cpr:18, mql:33, att:45, book:17.5, held:60, close:30,
+          hint:'Бенчмарки B2B-вебинаров США: явка 45% (консалтинг 40-50%), бронь 17,5% от пришедших (≈7% от рег.), доходимость до звонка 60% (норма 55-65%), close 30% (high-ticket 25-35%).'}
+};
+function applyPreset(key){
+  const p = PRESETS[key];
+  $('cpr').value=p.cpr; $('mql').value=p.mql; $('att').value=p.att;
+  $('book').value=p.book; $('held').value=p.held; $('close').value=p.close;
+  $('presetOur').classList.toggle('active', key==='our');
+  $('presetBench').classList.toggle('active', key==='bench');
+  $('presetHint').textContent = p.hint;
+  calc();
+}
+$('presetOur').addEventListener('click', ()=>applyPreset('our'));
+$('presetBench').addEventListener('click', ()=>applyPreset('bench'));
+
+const money = n => '$'+Math.round(n).toLocaleString('en-US');
+const money1 = n => '$'+(Math.round(n*10)/10).toLocaleString('en-US');
+const num1 = n => (Math.round(n*100)/100).toLocaleString('en-US',{maximumFractionDigits:2});
+
+function calc(){
+  const reg = +$('reg').value;
+  const cpr = +$('cpr').value;
+  const mqlP = +$('mql').value/100;
+  const attP = +$('att').value/100;
+  const bookP = +$('book').value/100;
+  const heldP = +$('held').value/100;
+  const closeP = +$('close').value/100;
+  const price = +$('price').value;
+  const ret = +$('ret').value;
+
+  // labels
+  $('regV').textContent = reg.toLocaleString('en-US');
+  $('cprV').textContent = '$'+cpr;
+  $('mqlV').textContent = (+$('mql').value)+'%';
+  $('attV').textContent = (+$('att').value)+'%';
+  $('bookV').textContent = (+$('book').value)+'%';
+  $('heldV').textContent = (+$('held').value)+'%';
+  $('closeV').textContent = (+$('close').value)+'%';
+  $('priceV').textContent = '$'+price;
+  $('retV').textContent = ret;
+
+  // funnel
+  const mql = reg*mqlP;
+  const att = reg*attP;
+  const mb  = att*bookP;
+  const mh  = mb*heldP;
+  const sales = mh*closeP;
+
+  const spend = reg*cpr;
+  const cMql = mql>0 ? spend/mql : 0;
+  const cMb  = mb>0 ? spend/mb : 0;
+  const cMh  = mh>0 ? spend/mh : 0;
+  const cac  = sales>0 ? spend/sales : 0;
+
+  const ltv = price*ret;
+  const mrr = sales*price;
+  const ltvRev = sales*ltv;
+  const roas1 = spend>0 ? mrr/spend : 0;
+  const roasLtv = spend>0 ? ltvRev/spend : 0;
+  const profit = ltvRev - spend;
+  const paybackMo = price>0 ? cac/price : 0;
+
+  // overall reg->sale conv
+  const conv = attP*bookP*heldP*closeP;
+  const be1 = price>0 ? price*conv : 0;        // breakeven cost/reg on 1 payment
+  const beLtv = ltv>0 ? ltv*conv : 0;          // breakeven cost/reg on LTV
+
+  // table
+  const rows = [
+    ['Регистранты','100%', reg.toLocaleString('en-US'), money(cpr)],
+    ['MQL (владелец $1M+)', (+$('mql').value)+'%', num1(mql), money(cMql)],
+    ['Пришли на вебинар', (+$('att').value)+'%', num1(att), '—'],
+    ['Бронь диагностики (MB)', (+$('book').value)+'% от пришедших', num1(mb), money(cMb)],
+    ['Дошли до диагностики (MH)', (+$('held').value)+'% от MB', num1(mh), money(cMh)],
+    ['Продажи', (+$('close').value)+'% от MH', num1(sales), money(cac)],
+  ];
+  $('ftable').innerHTML = rows.map(r=>`<tr class="stage"><td>${r[0]}</td><td class="num" style="color:var(--muted)">${r[1]}</td><td class="num">${r[2]}</td><td class="num acc">${r[3]}</td></tr>`).join('');
+
+  // bars (relative to registrants)
+  const bars = [
+    ['Регистранты', reg],
+    ['Пришли', att],
+    ['Бронь (MB)', mb],
+    ['Дошли (MH)', mh],
+    ['Продажи', sales],
+  ];
+  const max = reg;
+  $('fbars').innerHTML = bars.map(b=>{
+    const w = max>0 ? Math.max(b[1]/max*100, 1.5) : 0;
+    return `<div class="bar"><div class="lab">${b[0]}</div><div class="track"><div class="fill" style="width:${w}%">${num1(b[1])}</div></div></div>`;
+  }).join('');
+
+  // kpis
+  $('spend').textContent = money(spend);
+  $('mrr').textContent = money(mrr)+'/мес';
+  $('cac').textContent = money(cac);
+  $('payback').innerHTML = paybackMo<=1
+     ? `<span class="good">&lt; 1 мес</span>`
+     : `<span class="${paybackMo<=ret?'acc':'bad'}">${num1(paybackMo)} мес</span>`;
+  $('roas1').innerHTML = `<span class="${roas1>=1?'good':'bad'}">${num1(roas1)}x</span>`;
+  $('roasltv').textContent = num1(roasLtv)+'x';
+  $('ltvrev').textContent = money(ltvRev);
+  $('profit').innerHTML = `<span class="${profit>=0?'good':'bad'}">${money(profit)}</span>`;
+
+  $('be1').textContent = money(be1)+' / рег.';
+  $('beltv').textContent = money(beLtv)+' / рег.';
+
+  // verdict
+  let v='';
+  if(cpr<=be1) v=`При цене регистранта ${money(cpr)} и текущих конверсиях каждая сделка окупает трафик уже <b class="good">в 1-й месяц</b> (порог ${money(be1)}/рег.). Месяцы 2+ это прибыль.`;
+  else if(cpr<=beLtv) v=`Цена регистранта ${money(cpr)} окупается <b class="acc">не сразу, но на горизонте LTV</b> (порог месяца-1 ${money(be1)}/рег., LTV ${money(beLtv)}/рег.). Окупаемость CAC ~${num1(paybackMo)} мес.`;
+  else v=`<b class="bad">Убыток.</b> Цена регистранта ${money(cpr)} выше LTV-порога ${money(beLtv)}/рег. Снижай цену лида или поднимай доходимость/конверсию.`;
+  $('verdict').innerHTML = v + ` &nbsp;|&nbsp; Сквозная конверсия регистрант → продажа: <b>${(conv*100).toFixed(2)}%</b>.`;
+}
+applyPreset('our');
+</script>
+</body>
+</html>
