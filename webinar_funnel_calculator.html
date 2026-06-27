@@ -42,7 +42,7 @@
   .good{color:var(--green)} .bad{color:var(--red)} .acc{color:var(--accent)} .blue{color:var(--blue)}
   .funnelbars{margin-top:14px}
   .bar{display:flex;align-items:center;gap:10px;margin-bottom:7px;font-size:12.5px}
-  .bar .lab{width:150px;color:var(--muted)}
+  .bar .lab{width:175px;color:var(--muted)}
   .bar .track{flex:1;background:var(--card2);border-radius:6px;height:22px;overflow:hidden}
   .bar .fill{height:100%;background:linear-gradient(90deg,var(--accent),#ffb800);display:flex;align-items:center;padding-left:8px;font-weight:700;color:#111;border-radius:6px;white-space:nowrap}
   .note{font-size:12px;color:var(--muted);margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
@@ -55,27 +55,23 @@
 <body>
 <div class="wrap">
   <h1>Калькулятор вебинарной воронки · BB USA</h1>
-  <div class="sub">US trucking-владельцы $1M+ → вебинар → диагностика → продукт $4 990/мес. Крути ползунки, цифры пересчитываются вживую.</div>
-
+  <div class="sub">US trucking-владельцы $1M+ → вебинар → диагностика → продукт $4 990/мес. Крути ползунки, цифры пересчитываются вживую. Заявки считаются от дошедших до вебинара MQL — продать можно только им.</div>
   <div class="grid">
     <!-- INPUTS -->
     <div class="card">
       <h2>Входные данные</h2>
-
       <div class="scen" style="margin-bottom:10px">
         <button id="presetOur" class="active">Наши данные</button>
         <button id="presetBench">Бенчмарки US B2B</button>
       </div>
       <div id="presetHint" class="note" style="margin:0 0 12px;padding:0;border:none;font-size:11.5px"></div>
-
       <div class="scen">
         <button data-reg="100">100 Lead</button>
         <button data-reg="300">300 Lead</button>
         <button data-reg="1000" class="active">1000 Lead</button>
       </div>
-
       <div class="field">
-        <label>Lead на вебинар <b id="regV">1000</b></label>
+        <label>Lead на вебинар (все регистрации) <b id="regV">1000</b></label>
         <input type="number" id="reg" value="1000" min="1" step="10">
       </div>
       <div class="field">
@@ -83,20 +79,20 @@
         <input type="range" id="cpr" min="4" max="60" value="18" step="1">
       </div>
       <div class="field">
-        <label>% Lead = MQL (владелец $1M+) <b id="mqlV">33%</b></label>
-        <input type="range" id="mql" min="10" max="100" value="33" step="1">
+        <label>% Lead = MQL (владельцы $1M+) <b id="mqlV">33%</b></label>
+        <input type="range" id="mql" min="5" max="100" value="33" step="1">
       </div>
       <div class="field">
-        <label>Lead → пришёл на вебинар <b id="attV">40%</b></label>
-        <input type="range" id="att" min="10" max="70" value="40" step="1">
+        <label>MQL → дошёл до вебинара <b id="attV">65%</b></label>
+        <input type="range" id="att" min="10" max="95" value="65" step="1">
       </div>
       <div class="field">
-        <label>MQL → забронировал диагностику (MB) <b id="bookV">17.5%</b></label>
-        <input type="range" id="book" min="3" max="50" value="17.5" step="0.5">
+        <label>Дошедший MQL → заявка на диагностику (MB) <b id="bookV">22%</b></label>
+        <input type="range" id="book" min="3" max="80" value="22" step="0.5">
       </div>
       <div class="field">
-        <label>Бронь → дошёл до диагностики (MH) <b id="heldV">22%</b></label>
-        <input type="range" id="held" min="10" max="80" value="22" step="1">
+        <label>Заявка → дошёл до диагностики (MH) <b id="heldV">22%</b></label>
+        <input type="range" id="held" min="10" max="90" value="22" step="1">
       </div>
       <div class="field">
         <label>Диагностика → продажа <b id="closeV">30%</b></label>
@@ -111,7 +107,6 @@
         <input type="range" id="ret" min="1" max="18" value="4" step="1">
       </div>
     </div>
-
     <!-- OUTPUTS -->
     <div>
       <div class="card">
@@ -121,8 +116,8 @@
           <tbody id="ftable"></tbody>
         </table>
         <div class="funnelbars" id="fbars"></div>
+        <div class="note">Продажная цепочка: <b>Lead → MQL → MQL на вебинаре → Заявка (MB) → Дошёл до диагностики (MH) → Продажа</b>. MQL — слой квалифицированных владельцев $1M+ от всех регистраций. Дальше считаем только их доходимость и конверсии — продать можно только им.</div>
       </div>
-
       <div class="kpis">
         <div class="kpi"><div class="lab">Рекламный бюджет</div><div class="val" id="spend"></div></div>
         <div class="kpi"><div class="lab">Новый MRR (мес)</div><div class="val good" id="mrr"></div></div>
@@ -131,9 +126,8 @@
         <div class="kpi"><div class="lab">ROAS 1-й месяц</div><div class="val" id="roas1"></div></div>
         <div class="kpi"><div class="lab">ROAS на LTV</div><div class="val acc" id="roasltv"></div></div>
         <div class="kpi"><div class="lab">Выручка LTV</div><div class="val blue" id="ltvrev"></div></div>
-        <div class="kpi"><div class="lab">Прибыль LTV (выр.−трафик)</div><div class="val" id="profit"></div></div>
+        <div class="kpi"><div class="lab">Маржа после трафика (LTV)</div><div class="val" id="profit"></div></div>
       </div>
-
       <div class="card" style="margin-top:18px">
         <h2>Точка безубыточности по стоимости MQL</h2>
         <div class="be">
@@ -145,7 +139,6 @@
     </div>
   </div>
 </div>
-
 <script>
 const $ = id => document.getElementById(id);
 const ids = ['reg','cpr','mql','att','book','held','close','price','ret'];
@@ -158,13 +151,12 @@ document.querySelectorAll('.scen button').forEach(b=>{
     calc();
   });
 });
-
 // presets: только конверсии и цена лида. Цена продукта, удержание и кол-во рег. не трогаем.
 const PRESETS = {
-  our:   {cpr:18, mql:33, att:40, book:17.5, held:22, close:30,
-          hint:'Наши данные: доходимость до диагностики 22% (факт BB USA).'},
-  bench: {cpr:18, mql:33, att:45, book:17.5, held:60, close:30,
-          hint:'Бенчмарки B2B-вебинаров США: явка 45% (консалтинг 40-50%), бронь 17,5% от MQL (≈7% от рег.), доходимость до звонка 60% (норма 55-65%), close 30% (high-ticket 25-35%).'}
+  our:   {cpr:18, mql:33, att:65, book:22, held:22, close:30,
+          hint:'Наши данные: MQL = 33% от регистраций, доходимость MQL до вебинара 65%, заявка 22% от дошедших MQL (факт Business Booster USA).'},
+  bench: {cpr:18, mql:33, att:60, book:25, held:60, close:30,
+          hint:'Бенчмарки B2B-вебинаров США: MQL ≈33% от регистраций, доходимость MQL до вебинара 60% (норма 55-65%), заявка 25% от дошедших MQL, доходимость до звонка 60%, close 30% (high-ticket 25-35%).'}
 };
 function applyPreset(key){
   const p = PRESETS[key];
@@ -177,22 +169,18 @@ function applyPreset(key){
 }
 $('presetOur').addEventListener('click', ()=>applyPreset('our'));
 $('presetBench').addEventListener('click', ()=>applyPreset('bench'));
-
 const money = n => '$'+Math.round(n).toLocaleString('en-US');
-const money1 = n => '$'+(Math.round(n*10)/10).toLocaleString('en-US');
 const num1 = n => (Math.round(n*100)/100).toLocaleString('en-US',{maximumFractionDigits:2});
-
 function calc(){
   const reg = +$('reg').value;
   const cpr = +$('cpr').value;
   const mqlP = +$('mql').value/100;
-  const attP = +$('att').value/100;
-  const bookP = +$('book').value/100;
+  const attP = +$('att').value/100;     // MQL -> дошёл до вебинара
+  const bookP = +$('book').value/100;   // дошедший MQL -> заявка
   const heldP = +$('held').value/100;
   const closeP = +$('close').value/100;
   const price = +$('price').value;
   const ret = +$('ret').value;
-
   // labels
   $('regV').textContent = reg.toLocaleString('en-US');
   $('cprV').textContent = '$'+cpr;
@@ -203,20 +191,19 @@ function calc(){
   $('closeV').textContent = (+$('close').value)+'%';
   $('priceV').textContent = '$'+price;
   $('retV').textContent = ret;
-
-  // funnel: сначала все Lead, потом только MQL
-  const att = reg*attP;
-  const mql = att*mqlP;
-  const mb  = mql*bookP;
-  const mh  = mb*heldP;
-  const sales = mh*closeP;
-
+  // ВОРОНКА: MQL — слой от всех Lead (квал. владельцы $1M+).
+  // Дальше считаем доходимость MQL до вебинара и заявку от дошедших MQL — продать можно только им.
+  const mql = reg*mqlP;            // MQL = % от всех Lead
+  const mqlAtt = mql*attP;         // MQL, дошедшие до вебинара
+  const mb  = mqlAtt*bookP;        // заявка на диагностику — от дошедших MQL
+  const mh  = mb*heldP;            // дошёл до диагностики
+  const sales = mh*closeP;         // продажи
   const spend = reg*cpr;
-  const cMql = mql>0 ? spend/mql : 0;
+  const cMql    = mql>0   ? spend/mql   : 0;
+  const cMqlAtt = mqlAtt>0? spend/mqlAtt: 0;
   const cMb  = mb>0 ? spend/mb : 0;
   const cMh  = mh>0 ? spend/mh : 0;
   const cac  = sales>0 ? spend/sales : 0;
-
   const ltv = price*ret;
   const mrr = sales*price;
   const ltvRev = sales*ltv;
@@ -224,30 +211,28 @@ function calc(){
   const roasLtv = spend>0 ? ltvRev/spend : 0;
   const profit = ltvRev - spend;
   const paybackMo = price>0 ? cac/price : 0;
-
-  // overall Lead->sale conv
-  const conv = attP*mqlP*bookP*heldP*closeP;
-  const be1 = price>0 ? (price*conv)/mqlP : 0;        // breakeven cost/MQL on 1 payment
-  const beLtv = ltv>0 ? (ltv*conv)/mqlP : 0;          // breakeven cost/MQL on LTV
-
+  // сквозная конверсия Lead -> продажа
+  const conv = mqlP*attP*bookP*heldP*closeP;
+  // безубыточность по стоимости MQL (включает доходимость MQL до вебинара)
+  const be1 = price * attP * bookP * heldP * closeP;   // окупить 1-м платежом
+  const beLtv = ltv * attP * bookP * heldP * closeP;   // окупить на LTV
   // table
   const rows = [
-    ['Lead','100%', reg.toLocaleString('en-US'), money(cpr)],
-    ['Пришли на вебинар', (+$('att').value)+'%', num1(att), '—'],
-    ['MQL из пришедших', (+$('mql').value)+'%', num1(mql), money(cMql)],
-    ['Бронь диагностики (MB)', (+$('book').value)+'% от MQL', num1(mb), money(cMb)],
-    ['Дошли до диагностики (MH)', (+$('held').value)+'% от MB', num1(mh), money(cMh)],
+    ['Lead (регистрации)','100%', reg.toLocaleString('en-US'), money(cpr)],
+    ['MQL · владельцы $1M+', (+$('mql').value)+'% от Lead', num1(mql), money(cMql)],
+    ['MQL дошёл до вебинара', (+$('att').value)+'% от MQL', num1(mqlAtt), money(cMqlAtt)],
+    ['Заявка на диагностику (MB)', (+$('book').value)+'% от MQL на вебинаре', num1(mb), money(cMb)],
+    ['Дошёл до диагностики (MH)', (+$('held').value)+'% от MB', num1(mh), money(cMh)],
     ['Продажи', (+$('close').value)+'% от MH', num1(sales), money(cac)],
   ];
   $('ftable').innerHTML = rows.map(r=>`<tr class="stage"><td>${r[0]}</td><td class="num" style="color:var(--muted)">${r[1]}</td><td class="num">${r[2]}</td><td class="num acc">${r[3]}</td></tr>`).join('');
-
-  // bars (relative to registrants)
+  // bars (relative to leads)
   const bars = [
     ['Lead', reg],
-    ['Пришли', att],
-    ['MQL', mql],
-    ['Бронь (MB)', mb],
-    ['Дошли (MH)', mh],
+    ['MQL ($1M+)', mql],
+    ['MQL на вебинаре', mqlAtt],
+    ['Заявка (MB)', mb],
+    ['Дошёл (MH)', mh],
     ['Продажи', sales],
   ];
   const max = reg;
@@ -255,7 +240,6 @@ function calc(){
     const w = max>0 ? Math.max(b[1]/max*100, 1.5) : 0;
     return `<div class="bar"><div class="lab">${b[0]}</div><div class="track"><div class="fill" style="width:${w}%">${num1(b[1])}</div></div></div>`;
   }).join('');
-
   // kpis
   $('spend').textContent = money(spend);
   $('mrr').textContent = money(mrr)+'/мес';
@@ -267,16 +251,14 @@ function calc(){
   $('roasltv').textContent = num1(roasLtv)+'x';
   $('ltvrev').textContent = money(ltvRev);
   $('profit').innerHTML = `<span class="${profit>=0?'good':'bad'}">${money(profit)}</span>`;
-
   $('be1').textContent = money(be1)+' / MQL';
   $('beltv').textContent = money(beLtv)+' / MQL';
-
   // verdict
   let v='';
   const cMqlVal = cMql;
   if(cMqlVal<=be1) v=`При стоимости MQL ${money(cMqlVal)} и текущих конверсиях каждая сделка окупает трафик уже <b class="good">в 1-й месяц</b> (порог ${money(be1)}/MQL). Месяцы 2+ это прибыль.`;
   else if(cMqlVal<=beLtv) v=`Стоимость MQL ${money(cMqlVal)} окупается <b class="acc">не сразу, но на горизонте LTV</b> (порог месяца-1 ${money(be1)}/MQL, LTV ${money(beLtv)}/MQL). Окупаемость CAC ~${num1(paybackMo)} мес.`;
-  else v=`<b class="bad">Убыток.</b> Стоимость MQL ${money(cMqlVal)} выше LTV-порога ${money(beLtv)}/MQL. Снижай цену лида или поднимай доходимость/конверсию.`;
+  else v=`<b class="bad">Убыток.</b> Стоимость MQL ${money(cMqlVal)} выше LTV-порога ${money(beLtv)}/MQL. Снижай цену лида, поднимай долю MQL, доходимость до вебинара или конверсию в заявку/диагностику/продажу.`;
   $('verdict').innerHTML = v + ` &nbsp;|&nbsp; Сквозная конверсия Lead → продажа: <b>${(conv*100).toFixed(2)}%</b>.`;
 }
 applyPreset('our');
