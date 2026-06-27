@@ -91,7 +91,7 @@
         <input type="range" id="att" min="10" max="70" value="40" step="1">
       </div>
       <div class="field">
-        <label>Пришёл → забронировал диагностику (MB) <b id="bookV">17.5%</b></label>
+        <label>MQL → забронировал диагностику (MB) <b id="bookV">17.5%</b></label>
         <input type="range" id="book" min="3" max="50" value="17.5" step="0.5">
       </div>
       <div class="field">
@@ -164,7 +164,7 @@ const PRESETS = {
   our:   {cpr:18, mql:33, att:40, book:17.5, held:22, close:30,
           hint:'Наши данные: доходимость до диагностики 22% (факт BB USA).'},
   bench: {cpr:18, mql:33, att:45, book:17.5, held:60, close:30,
-          hint:'Бенчмарки B2B-вебинаров США: явка 45% (консалтинг 40-50%), бронь 17,5% от пришедших (≈7% от рег.), доходимость до звонка 60% (норма 55-65%), close 30% (high-ticket 25-35%).'}
+          hint:'Бенчмарки B2B-вебинаров США: явка 45% (консалтинг 40-50%), бронь 17,5% от MQL (≈7% от рег.), доходимость до звонка 60% (норма 55-65%), close 30% (high-ticket 25-35%).'}
 };
 function applyPreset(key){
   const p = PRESETS[key];
@@ -204,10 +204,10 @@ function calc(){
   $('priceV').textContent = '$'+price;
   $('retV').textContent = ret;
 
-  // funnel
-  const mql = reg*mqlP;
+  // funnel: сначала все Lead, потом только MQL
   const att = reg*attP;
-  const mb  = att*bookP;
+  const mql = att*mqlP;
+  const mb  = mql*bookP;
   const mh  = mb*heldP;
   const sales = mh*closeP;
 
@@ -225,17 +225,17 @@ function calc(){
   const profit = ltvRev - spend;
   const paybackMo = price>0 ? cac/price : 0;
 
-  // overall reg->sale conv
-  const conv = attP*bookP*heldP*closeP;
+  // overall Lead->sale conv
+  const conv = attP*mqlP*bookP*heldP*closeP;
   const be1 = price>0 ? (price*conv)/mqlP : 0;        // breakeven cost/MQL on 1 payment
   const beLtv = ltv>0 ? (ltv*conv)/mqlP : 0;          // breakeven cost/MQL on LTV
 
   // table
   const rows = [
     ['Lead','100%', reg.toLocaleString('en-US'), money(cpr)],
-    ['MQL (владелец $1M+)', (+$('mql').value)+'%', num1(mql), money(cMql)],
     ['Пришли на вебинар', (+$('att').value)+'%', num1(att), '—'],
-    ['Бронь диагностики (MB)', (+$('book').value)+'% от пришедших', num1(mb), money(cMb)],
+    ['MQL из пришедших', (+$('mql').value)+'%', num1(mql), money(cMql)],
+    ['Бронь диагностики (MB)', (+$('book').value)+'% от MQL', num1(mb), money(cMb)],
     ['Дошли до диагностики (MH)', (+$('held').value)+'% от MB', num1(mh), money(cMh)],
     ['Продажи', (+$('close').value)+'% от MH', num1(sales), money(cac)],
   ];
@@ -245,6 +245,7 @@ function calc(){
   const bars = [
     ['Lead', reg],
     ['Пришли', att],
+    ['MQL', mql],
     ['Бронь (MB)', mb],
     ['Дошли (MH)', mh],
     ['Продажи', sales],
